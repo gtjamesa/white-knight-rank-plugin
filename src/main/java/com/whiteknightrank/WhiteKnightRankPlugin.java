@@ -7,6 +7,8 @@ import net.runelite.api.ChatMessageType;
 import net.runelite.api.Client;
 import net.runelite.api.GameState;
 import net.runelite.api.events.GameStateChanged;
+import net.runelite.api.events.WidgetLoaded;
+import net.runelite.api.widgets.WidgetID;
 import net.runelite.client.config.ConfigManager;
 import net.runelite.client.eventbus.Subscribe;
 import net.runelite.client.plugins.Plugin;
@@ -16,14 +18,16 @@ import net.runelite.client.plugins.PluginDescriptor;
 @PluginDescriptor(name = "White Knight Rank", description = "Track your White Knight rank and Black Knight kills.", tags = {"white", "knight", "black", "whiteknight", "blackknight"})
 public class WhiteKnightRankPlugin extends Plugin
 {
-	public static final int KC_LOG_COMPONENT_ID = 7798814;
-	public static final String KC_LOG_TEXT_MATCH = "White Knight with a kill score of <col=\\d+>(\\d+)<col=\\d+>";
-
 	@Inject
 	private Client client;
 
 	@Inject
 	private WhiteKnightRankConfig config;
+
+	@Inject
+	private QuestLogParser questLogParser;
+
+	private int kc = 0;
 
 	@Override
 	protected void startUp() throws Exception
@@ -44,6 +48,18 @@ public class WhiteKnightRankPlugin extends Plugin
 		{
 			client.addChatMessage(ChatMessageType.GAMEMESSAGE, "", "Example says " + config.greeting(), null);
 		}
+	}
+
+	@Subscribe
+	public void onWidgetLoaded(WidgetLoaded event)
+	{
+		if (event.getGroupId() != WidgetID.DIARY_QUEST_GROUP_ID || !questLogParser.isWantedQuest())
+		{
+			return;
+		}
+
+		kc = questLogParser.getKc();
+		log.info("KC from parser: {}", kc);
 	}
 
 	@Provides

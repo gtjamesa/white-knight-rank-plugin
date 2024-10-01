@@ -28,6 +28,7 @@ public class WhiteKnightRankPlugin extends Plugin
 	private QuestLogParser questLogParser;
 
 	private int kc = 0;
+	private KnightRank knightRank = KnightRank.NOVICE;
 
 	@Override
 	protected void startUp() throws Exception
@@ -59,6 +60,8 @@ public class WhiteKnightRankPlugin extends Plugin
 		}
 
 		kc = questLogParser.getKc();
+		knightRank = KnightRank.valueOfKc(kc);
+
 		log.info("KC from parser: {}", kc);
 	}
 

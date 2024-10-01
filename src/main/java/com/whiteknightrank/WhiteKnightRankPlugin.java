@@ -1,4 +1,4 @@
-package com.example;
+package com.whiteknightrank;
 
 import com.google.inject.Provides;
 import javax.inject.Inject;
@@ -13,16 +13,17 @@ import net.runelite.client.plugins.Plugin;
 import net.runelite.client.plugins.PluginDescriptor;
 
 @Slf4j
-@PluginDescriptor(
-	name = "Example"
-)
-public class ExamplePlugin extends Plugin
+@PluginDescriptor(name = "White Knight Rank", description = "Track your White Knight rank and Black Knight kills.", tags = {"white", "knight", "black", "whiteknight", "blackknight"})
+public class WhiteKnightRankPlugin extends Plugin
 {
+	public static final int KC_LOG_COMPONENT_ID = 7798814;
+	public static final String KC_LOG_TEXT_MATCH = "White Knight with a kill score of <col=\\d+>(\\d+)<col=\\d+>";
+
 	@Inject
 	private Client client;
 
 	@Inject
-	private ExampleConfig config;
+	private WhiteKnightRankConfig config;
 
 	@Override
 	protected void startUp() throws Exception
@@ -46,8 +47,8 @@ public class ExamplePlugin extends Plugin
 	}
 
 	@Provides
-	ExampleConfig provideConfig(ConfigManager configManager)
+	WhiteKnightRankConfig provideConfig(ConfigManager configManager)
 	{
-		return configManager.getConfig(ExampleConfig.class);
+		return configManager.getConfig(WhiteKnightRankConfig.class);
 	}
 }

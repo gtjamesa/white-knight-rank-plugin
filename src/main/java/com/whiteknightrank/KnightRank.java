@@ -34,7 +34,7 @@ public enum KnightRank
 
 	public String prettyName()
 	{
-		return name().substring(0, 1).toUpperCase() + name().substring(1).toLowerCase();
+		return name().substring(0, 1).toUpperCase() + name().substring(1).toLowerCase().replaceAll("_", " ");
 	}
 
 	public static KnightRank valueOfKc(int kc)

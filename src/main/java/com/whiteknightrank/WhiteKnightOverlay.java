@@ -8,6 +8,7 @@ import static net.runelite.api.MenuAction.RUNELITE_OVERLAY_CONFIG;
 import static net.runelite.client.ui.overlay.OverlayManager.OPTION_CONFIGURE;
 import net.runelite.client.ui.overlay.OverlayPanel;
 import net.runelite.client.ui.overlay.OverlayPosition;
+import net.runelite.client.ui.overlay.components.LineComponent;
 import net.runelite.client.ui.overlay.components.TitleComponent;
 
 public class WhiteKnightOverlay extends OverlayPanel
@@ -33,14 +34,9 @@ public class WhiteKnightOverlay extends OverlayPanel
 			return null;
 		}
 
-		final String kcString = String.format("KC: %d", plugin.getKc());
-		final String rankString = String.format("Rank: %s", plugin.getKnightRank().prettyName());
-		final int maxWidth = Math.max(graphics.getFontMetrics().stringWidth(kcString), graphics.getFontMetrics().stringWidth(rankString));
-
-		panelComponent.getChildren().add(TitleComponent.builder().text(kcString).color(Color.WHITE).build());
-		panelComponent.getChildren().add(TitleComponent.builder().text(rankString).color(Color.WHITE).build());
-
-//		panelComponent.setPreferredSize(new Dimension(maxWidth + 10, 0));
+		panelComponent.getChildren().add(TitleComponent.builder().text("White Knight Rank").color(Color.WHITE).build());
+		panelComponent.getChildren().add(LineComponent.builder().left("Kills").right(String.valueOf(plugin.getKc())).build());
+		panelComponent.getChildren().add(LineComponent.builder().left("Rank").right(plugin.getKnightRank().prettyName()).build());
 
 		return super.render(graphics);
 	}

@@ -7,12 +7,6 @@ import net.runelite.client.config.ConfigItem;
 @ConfigGroup("whiteknightrank")
 public interface WhiteKnightRankConfig extends Config
 {
-	@ConfigItem(keyName = "showInfobox", name = "Show Infobox", description = "Show an infobox with your current KC and rank")
-	default boolean showInfobox()
-	{
-		return true;
-	}
-
 	@ConfigItem(keyName = "showOverlay", name = "Show Overlay", description = "Show an overlay when actively killing knights")
 	default boolean showOverlay()
 	{

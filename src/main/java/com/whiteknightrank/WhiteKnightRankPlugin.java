@@ -1,12 +1,15 @@
 package com.whiteknightrank;
 
 import com.google.inject.Provides;
+import java.time.temporal.ChronoUnit;
 import javax.inject.Inject;
+import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import net.runelite.api.Client;
 import net.runelite.api.GameState;
 import net.runelite.api.NPC;
 import net.runelite.api.events.GameStateChanged;
+import net.runelite.api.events.NpcSpawned;
 import net.runelite.api.events.WidgetLoaded;
 import net.runelite.api.widgets.WidgetID;
 import net.runelite.client.config.ConfigManager;
@@ -14,6 +17,8 @@ import net.runelite.client.eventbus.Subscribe;
 import net.runelite.client.events.NpcLootReceived;
 import net.runelite.client.plugins.Plugin;
 import net.runelite.client.plugins.PluginDescriptor;
+import net.runelite.client.task.Schedule;
+import net.runelite.client.ui.overlay.OverlayManager;
 
 @Slf4j
 @PluginDescriptor(name = "White Knight Rank", description = "Track your White Knight rank and Black Knight kills.", tags = {"white", "knight", "black", "whiteknight", "blackknight"})
@@ -29,24 +34,39 @@ public class WhiteKnightRankPlugin extends Plugin
 	private WhiteKnightRankConfig config;
 
 	@Inject
+	private OverlayManager overlayManager;
+
+	@Inject
+	private WhiteKnightOverlay overlay;
+
+	@Inject
 	public ConfigManager configManager;
 
 	@Inject
 	private QuestLogParser questLogParser;
 
+	@Getter
 	private int kc = 0;
+
+	@Getter
 	private KnightRank knightRank = KnightRank.NOVICE;
+
+	@Getter
+	private long lastKillTime;
+
+	@Getter
+	private boolean knightNearby;
 
 	@Override
 	protected void startUp() throws Exception
 	{
-//		log.info("Example started!");
+		overlayManager.add(overlay);
 	}
 
 	@Override
 	protected void shutDown() throws Exception
 	{
-//		log.info("Example stopped!");
+		overlayManager.remove(overlay);
 	}
 
 	@Subscribe
@@ -87,8 +107,42 @@ public class WhiteKnightRankPlugin extends Plugin
 		int points = KnightNpc.getPoints(npc.getId());
 		kc += points;
 		knightRank = KnightRank.valueOfKc(kc);
+		lastKillTime = System.currentTimeMillis() / 1000L;
 		saveKc();
 		log.debug("Killed: {} (ID: {} / P: {} / C: {}) / KC: {} / {}", npc.getName(), npc.getId(), points, npc.getCombatLevel(), kc, knightRank.name());
+	}
+
+	@Subscribe
+	public void onNpcSpawned(NpcSpawned npcSpawned)
+	{
+		final NPC npc = npcSpawned.getNpc();
+
+		if (!KnightNpc.isKnight(npc.getId()))
+		{
+			return;
+		}
+
+		knightNearby = true;
+		log.debug("Spawned: {} (ID: {} / C: {})", npc.getName(), npc.getId(), npc.getCombatLevel());
+	}
+
+	@Schedule(period = 590, unit = ChronoUnit.SECONDS, asynchronous = true)
+	public void knightNearbyTask()
+	{
+		// Reset the flag every 9m50s, and it should be reactivated if a knight is nearby
+		knightNearby = false;
+	}
+
+	/**
+	 * Check if the overlay should be shown
+	 * The conditions are that a knight is nearby or has been killed in the last 10 minutes
+	 *
+	 * @return boolean
+	 */
+	public boolean shouldShowOverlay()
+	{
+		long currentTime = System.currentTimeMillis() / 1000L;
+		return knightNearby || lastKillTime >= currentTime - 600;
 	}
 
 	private void saveKc()

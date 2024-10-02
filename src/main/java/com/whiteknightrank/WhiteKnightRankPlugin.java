@@ -3,14 +3,15 @@ package com.whiteknightrank;
 import com.google.inject.Provides;
 import javax.inject.Inject;
 import lombok.extern.slf4j.Slf4j;
-import net.runelite.api.ChatMessageType;
 import net.runelite.api.Client;
 import net.runelite.api.GameState;
+import net.runelite.api.NPC;
 import net.runelite.api.events.GameStateChanged;
 import net.runelite.api.events.WidgetLoaded;
 import net.runelite.api.widgets.WidgetID;
 import net.runelite.client.config.ConfigManager;
 import net.runelite.client.eventbus.Subscribe;
+import net.runelite.client.events.NpcLootReceived;
 import net.runelite.client.plugins.Plugin;
 import net.runelite.client.plugins.PluginDescriptor;
 
@@ -71,6 +72,23 @@ public class WhiteKnightRankPlugin extends Plugin
 		saveKc();
 
 		log.info("KC from parser: {}", kc);
+	}
+
+	@Subscribe
+	public void onNpcLootReceived(final NpcLootReceived npcLootReceived)
+	{
+		final NPC npc = npcLootReceived.getNpc();
+
+		if (!KnightNpc.isKnight(npc.getId()))
+		{
+			return;
+		}
+
+		int points = KnightNpc.getPoints(npc.getId());
+		kc += points;
+		knightRank = KnightRank.valueOfKc(kc);
+		saveKc();
+		log.debug("Killed: {} (ID: {} / P: {} / C: {}) / KC: {} / {}", npc.getName(), npc.getId(), points, npc.getCombatLevel(), kc, knightRank.name());
 	}
 
 	private void saveKc()

@@ -33,10 +33,8 @@ public class WhiteKnightOverlay extends OverlayPanel
 			return null;
 		}
 
-		String rank = plugin.getKnightRank().name();
-
 		final String kcString = String.format("KC: %d", plugin.getKc());
-		final String rankString = String.format("Rank: %s", rank.substring(0, 1).toUpperCase() + rank.substring(1).toLowerCase());
+		final String rankString = String.format("Rank: %s", plugin.getKnightRank().prettyName());
 		final int maxWidth = Math.max(graphics.getFontMetrics().stringWidth(kcString), graphics.getFontMetrics().stringWidth(rankString));
 
 		panelComponent.getChildren().add(TitleComponent.builder().text(kcString).color(Color.WHITE).build());

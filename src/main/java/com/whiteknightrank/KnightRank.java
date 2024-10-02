@@ -32,6 +32,11 @@ public enum KnightRank
 		this.kc = kc;
 	}
 
+	public String prettyName()
+	{
+		return name().substring(0, 1).toUpperCase() + name().substring(1).toLowerCase();
+	}
+
 	public static KnightRank valueOfKc(int kc)
 	{
 		for (KnightRank e : values())

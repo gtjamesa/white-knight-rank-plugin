@@ -106,7 +106,7 @@ public class WhiteKnightRankPlugin extends Plugin
 		knightRank = KnightRank.valueOfKc(kc);
 		lastKillTime = System.currentTimeMillis() / 1000L;
 		saveKc();
-		log.debug("Killed: {} (ID: {} / P: {}) / KC: {} / {}", npc.getName(), npc.getId(), points, kc, knightRank.name());
+		log.debug("Killed: {} (ID: {} / P: {}) / KC: {} / {}", npc.getName(), npc.getId(), points, kc, knightRank.prettyName());
 	}
 
 
@@ -142,7 +142,7 @@ public class WhiteKnightRankPlugin extends Plugin
 			kc = Integer.parseInt(loadedKc);
 			knightRank = KnightRank.valueOfKc(kc);
 			assert knightRank != null;
-			log.debug("Loaded KC: {} / {}", loadedKc, knightRank.name());
+			log.debug("Loaded KC: {} / {}", loadedKc, knightRank.prettyName());
 		}
 	}
 

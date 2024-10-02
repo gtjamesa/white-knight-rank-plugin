@@ -9,7 +9,7 @@ public enum KnightRank
 {
 	MASTER(1300),
 	ADEPT(800),
-	NOBLE(400),
+	NOBLE(500),
 	PAGE(300),
 	PEON(200),
 	NOVICE(100),

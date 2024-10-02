@@ -50,7 +50,7 @@ public class WhiteKnightRankPlugin extends Plugin
 	private int kc = 0;
 
 	@Getter
-	private KnightRank knightRank = KnightRank.NOVICE;
+	private KnightRank knightRank = KnightRank.NO_RANK;
 
 	@Getter
 	private long lastKillTime;

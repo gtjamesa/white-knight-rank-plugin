@@ -13,9 +13,9 @@ public interface WhiteKnightRankConfig extends Config
 		return true;
 	}
 
-//	@ConfigItem(keyName = "showNotificationOnRank", name = "Notify on rank", description = "Receive a notification when you rank up")
-//	default boolean showNotificationOnRank()
-//	{
-//		return true;
-//	}
+	@ConfigItem(keyName = "showNotificationOnRank", name = "Notify on rank", description = "Receive a notification when you rank up")
+	default boolean showNotificationOnRank()
+	{
+		return true;
+	}
 }

@@ -10,6 +10,7 @@ import net.runelite.api.NPC;
 import net.runelite.api.events.GameStateChanged;
 import net.runelite.api.events.WidgetLoaded;
 import net.runelite.api.widgets.WidgetID;
+import net.runelite.client.Notifier;
 import net.runelite.client.config.ConfigManager;
 import net.runelite.client.eventbus.Subscribe;
 import net.runelite.client.events.NpcLootReceived;
@@ -34,10 +35,13 @@ public class WhiteKnightRankPlugin extends Plugin
 	private OverlayManager overlayManager;
 
 	@Inject
-	private WhiteKnightOverlay overlay;
+	private Notifier notifier;
 
 	@Inject
 	public ConfigManager configManager;
+
+	@Inject
+	private WhiteKnightOverlay overlay;
 
 	@Inject
 	private QuestLogParser questLogParser;
@@ -55,9 +59,6 @@ public class WhiteKnightRankPlugin extends Plugin
 	protected void startUp() throws Exception
 	{
 		overlayManager.add(overlay);
-
-		// TODO: Chat message notification:
-		//		Chat message type GAMEMESSAGE: Congratulations! You are now a White Knight Peon!
 	}
 
 	@Override
@@ -96,19 +97,29 @@ public class WhiteKnightRankPlugin extends Plugin
 	{
 		final NPC npc = npcLootReceived.getNpc();
 
-		if (!KnightNpc.isKnight(npc.getId()))
+		if (KnightNpc.isKnight(npc.getId()))
 		{
-			return;
+			trackKill(npc);
 		}
+	}
 
+	private void trackKill(NPC npc)
+	{
 		int points = KnightNpc.getPoints(npc.getId());
+		KnightRank oldRank = knightRank;
+
 		kc += points;
 		knightRank = KnightRank.valueOfKc(kc);
 		lastKillTime = System.currentTimeMillis() / 1000L;
+
+		if (config.showNotificationOnRank() && oldRank != knightRank)
+		{
+			notifier.notify("Congratulations! You are now a White Knight " + knightRank.prettyName() + "!");
+		}
+
 		saveKc();
 		log.debug("Killed: {} (ID: {} / P: {}) / KC: {} / {}", npc.getName(), npc.getId(), points, kc, knightRank.prettyName());
 	}
-
 
 	/**
 	 * Check if the overlay should be shown

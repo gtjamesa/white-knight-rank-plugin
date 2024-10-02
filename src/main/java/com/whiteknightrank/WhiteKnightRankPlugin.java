@@ -1,7 +1,6 @@
 package com.whiteknightrank;
 
 import com.google.inject.Provides;
-import java.time.temporal.ChronoUnit;
 import javax.inject.Inject;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
@@ -9,7 +8,6 @@ import net.runelite.api.Client;
 import net.runelite.api.GameState;
 import net.runelite.api.NPC;
 import net.runelite.api.events.GameStateChanged;
-import net.runelite.api.events.NpcSpawned;
 import net.runelite.api.events.WidgetLoaded;
 import net.runelite.api.widgets.WidgetID;
 import net.runelite.client.config.ConfigManager;
@@ -17,7 +15,6 @@ import net.runelite.client.eventbus.Subscribe;
 import net.runelite.client.events.NpcLootReceived;
 import net.runelite.client.plugins.Plugin;
 import net.runelite.client.plugins.PluginDescriptor;
-import net.runelite.client.task.Schedule;
 import net.runelite.client.ui.overlay.OverlayManager;
 
 @Slf4j
@@ -54,13 +51,13 @@ public class WhiteKnightRankPlugin extends Plugin
 	@Getter
 	private long lastKillTime;
 
-	@Getter
-	private boolean knightNearby;
-
 	@Override
 	protected void startUp() throws Exception
 	{
 		overlayManager.add(overlay);
+
+		// TODO: Chat message notification:
+		//		Chat message type GAMEMESSAGE: Congratulations! You are now a White Knight Peon!
 	}
 
 	@Override
@@ -91,7 +88,7 @@ public class WhiteKnightRankPlugin extends Plugin
 		knightRank = KnightRank.valueOfKc(kc);
 		saveKc();
 
-		log.info("KC from parser: {}", kc);
+		log.debug("KC from quest log: {}", kc);
 	}
 
 	@Subscribe
@@ -109,29 +106,9 @@ public class WhiteKnightRankPlugin extends Plugin
 		knightRank = KnightRank.valueOfKc(kc);
 		lastKillTime = System.currentTimeMillis() / 1000L;
 		saveKc();
-		log.debug("Killed: {} (ID: {} / P: {} / C: {}) / KC: {} / {}", npc.getName(), npc.getId(), points, npc.getCombatLevel(), kc, knightRank.name());
+		log.debug("Killed: {} (ID: {} / P: {}) / KC: {} / {}", npc.getName(), npc.getId(), points, kc, knightRank.name());
 	}
 
-	@Subscribe
-	public void onNpcSpawned(NpcSpawned npcSpawned)
-	{
-		final NPC npc = npcSpawned.getNpc();
-
-		if (!KnightNpc.isKnight(npc.getId()))
-		{
-			return;
-		}
-
-		knightNearby = true;
-		log.debug("Spawned: {} (ID: {} / C: {})", npc.getName(), npc.getId(), npc.getCombatLevel());
-	}
-
-	@Schedule(period = 590, unit = ChronoUnit.SECONDS, asynchronous = true)
-	public void knightNearbyTask()
-	{
-		// Reset the flag every 9m50s, and it should be reactivated if a knight is nearby
-		knightNearby = false;
-	}
 
 	/**
 	 * Check if the overlay should be shown
@@ -139,10 +116,10 @@ public class WhiteKnightRankPlugin extends Plugin
 	 *
 	 * @return boolean
 	 */
-	public boolean shouldShowOverlay()
+	public boolean recentlyKilledKnight()
 	{
 		long currentTime = System.currentTimeMillis() / 1000L;
-		return knightNearby || lastKillTime >= currentTime - 600;
+		return lastKillTime >= currentTime - 600;
 	}
 
 	private void saveKc()
@@ -165,7 +142,7 @@ public class WhiteKnightRankPlugin extends Plugin
 			kc = Integer.parseInt(loadedKc);
 			knightRank = KnightRank.valueOfKc(kc);
 			assert knightRank != null;
-			log.info("Loaded KC: {} / {}", loadedKc, knightRank.name());
+			log.debug("Loaded KC: {} / {}", loadedKc, knightRank.name());
 		}
 	}
 

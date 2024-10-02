@@ -19,7 +19,7 @@ public class WhiteKnightOverlay extends OverlayPanel
 	private WhiteKnightOverlay(WhiteKnightRankPlugin plugin, WhiteKnightRankConfig config)
 	{
 		super(plugin);
-		setPosition(OverlayPosition.TOP_LEFT);
+		setPosition(OverlayPosition.TOP_CENTER);
 		this.plugin = plugin;
 		this.config = config;
 		addMenuEntry(RUNELITE_OVERLAY_CONFIG, OPTION_CONFIGURE, "White Knight overlay");
@@ -28,7 +28,7 @@ public class WhiteKnightOverlay extends OverlayPanel
 	@Override
 	public Dimension render(Graphics2D graphics)
 	{
-		if (!config.showOverlay() || !plugin.shouldShowOverlay())
+		if (!config.showOverlay() || !plugin.recentlyKilledKnight())
 		{
 			return null;
 		}

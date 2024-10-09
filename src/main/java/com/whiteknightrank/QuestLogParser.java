@@ -12,7 +12,7 @@ import net.runelite.api.widgets.Widget;
 public class QuestLogParser
 {
 	public static final int KC_LOG_COMPONENT_ID = 7798814;
-	public static final String KC_LOG_TEXT_MATCH = "White Knight with a kill score of <col=\\d+>(\\d+)<col=\\d+>";
+	public static final String KC_LOG_TEXT_MATCH = "White Knight with a kill score of <col=\\d+>([\\d,]+)<col=\\d+>";
 	public static final String QUEST_NAME = "Wanted!";
 
 	@Inject
@@ -39,9 +39,11 @@ public class QuestLogParser
 
 		if (found)
 		{
-			String kc = matcher.group(1);
+			String kc = matcher.group(1).replaceAll(",", "");
 			return Integer.parseInt(kc);
 		}
+
+		log.debug("Failed to parse KC from widget text: {}", widget.getText());
 
 		return 0;
 	}

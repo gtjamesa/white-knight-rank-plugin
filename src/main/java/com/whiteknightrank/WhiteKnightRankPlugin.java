@@ -123,14 +123,14 @@ public class WhiteKnightRankPlugin extends Plugin
 
 	/**
 	 * Check if the overlay should be shown
-	 * The conditions are that a knight is nearby or has been killed in the last 10 minutes
+	 * The conditions are that a knight is nearby or has been killed in the last 5 minutes
 	 *
 	 * @return boolean
 	 */
 	public boolean recentlyKilledKnight()
 	{
 		long currentTime = System.currentTimeMillis() / 1000L;
-		return lastKillTime >= currentTime - 600;
+		return lastKillTime >= currentTime - 300;
 	}
 
 	private void saveKc()

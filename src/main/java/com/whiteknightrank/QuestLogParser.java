@@ -11,8 +11,8 @@ import net.runelite.api.widgets.Widget;
 @Slf4j
 public class QuestLogParser
 {
-	public static final int KC_LOG_COMPONENT_ID = 7798814;
-	public static final int KC_MASTER_LOG_COMPONENT_ID = 7798813;
+	public static final int KC_LOG_COMPONENT_ID = 7798815;
+	public static final int KC_MASTER_LOG_COMPONENT_ID = 7798814;
 	public static final String KC_LOG_TEXT_MATCH = "White Knight with a kill score of <col=\\d+>([\\d,]+)<col=\\d+>";
 	public static final String QUEST_NAME = "Wanted!";
 
@@ -64,7 +64,15 @@ public class QuestLogParser
 		{
 			Widget widget = client.getWidget(widgetId);
 
-			if (widget != null && widget.getText() != null && !widget.getText().isEmpty())
+			if (widget == null || widget.getText() == null || widget.getText().isEmpty())
+			{
+				continue;
+			}
+
+			String text = widget.getText();
+
+			// Only accept the widget that actually contains KC info
+			if (text.contains("kill score"))
 			{
 				return widget;
 			}
